@@ -4,48 +4,42 @@
 2026-01-28
 
 ## Last work context
-**Session Focus: Major feature additions and bug fixes**
+**Session Focus: FocusManager Refactoring to Environment-based**
 
-Added several major systems:
-- **Theming System** with 8 predefined themes (Phosphor variants, ncurses, Dark/Light)
-- **Lifecycle Modifiers** (onAppear, onDisappear, task)
-- **Storage System** (@AppStorage, @SceneStorage) with Linux support
-- **Preferences System** for bottom-up data flow
-- **Flexible Frame** with minWidth/maxWidth/maxHeight/.infinity
-- **Linux Compatibility** (Glibc, XDG paths, UserDefaults emulation)
+Refactored the FocusManager from singleton pattern to Environment-based injection:
+- Removed `FocusManager.shared` singleton
+- Added `FocusManagerKey` for Environment access via `\.focusManager`
+- `FocusState` now reads from `EnvironmentStorage`
+- `AppRunner` creates and injects FocusManager instance
+- `Button` accesses FocusManager via `context.environment`
+- Updated all tests to use independent FocusManager instances
+- Added new test suite for Environment integration
 
-Fixed critical bugs:
-- Render loop caused by statusBarItems modifier
-- q-quit not working when StatusBar item has no action
-- Overlay/Border extending beyond terminal bounds
-- StatusBar .justified alignment uneven at edges
+**Key Result: Tests can now run in parallel!** No more `--no-parallel` needed.
 
 ## Active tasks
-- [ ] FocusManager: Refactor from singleton to Environment-based
-- [ ] Commit current changes (Theme system)
+- [ ] Rename package from SwiftTUI to TUIKit (name collision with existing package)
 - [ ] Open PR for `feature/tview-foundation`
 
 ## Next steps
-1. **Commit Theme system** - Current uncommitted changes
-2. **FocusManager Refactoring** - Move to Environment (fixes parallel test issues)
-3. **TextField View** - Text input with cursor management
-4. **ScrollView** - Scrollable content area
-5. **Improve HStack** - Two-pass layout (measure, then position)
+1. **Rename to TUIKit** - Package name, imports, folder structure
+2. **TextField View** - Text input with cursor management
+3. **ScrollView** - Scrollable content area
+4. **Improve HStack** - Two-pass layout (measure, then position)
 
 ## Open questions/blockers
 - `AppState.shared` is still a singleton - should be replaced with Environment-based render trigger
 - Should `DefaultTheme` be renamed to `ANSITheme`? What should be the actual default?
-- HStack layout needs two-pass measurement for proper Spacer behavior
 
 ## Important decisions
 - **No singletons for state** - Use Environment system instead
-- **Theming via Environment** - `\.theme` environment key, not ThemeManager singleton
-- **Linux support** - Full compatibility with XDG paths and JSON storage
-- **16M color support** - RGB, Hex (string and integer), HSL colors
-- **Predefined themes** - Phosphor variants (Green, Amber, White, Red), ncurses, Dark, Light
+- **FocusManager via Environment** - `\.focusManager` environment key
+- **Package rename to TUIKit** - Due to name collision with rensbreur/SwiftTUI
 
 ## Notes
-- Run tests with `swift test --no-parallel` (FocusManager singleton issue)
-- 178 tests across 26 suites, all passing
-- Theme colors accessible via `Color.theme.foreground` or `@Environment(\.theme)`
-- StatusBar items set via `.statusBarItems()` modifier (silent, no render loop)
+- Run tests with `swift test` (parallel now works!)
+- 181 tests across 27 suites, all passing
+- FocusManager accessible via `@Environment(\.focusManager)` or `context.environment.focusManager`
+
+## Commits this session
+- `5b54c26` - refactor: Replace FocusManager singleton with Environment-based injection

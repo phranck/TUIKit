@@ -18,24 +18,24 @@ SwiftTUI/
 │   ├── SwiftTUI/                      # Main library target
 │   │   ├── SwiftTUI.swift             # Version constant, renderOnce() helper
 │   │   ├── App/
-│   │   │   ├── TApp.swift             # TApp protocol, AppRunner, StatusBarState
-│   │   │   └── TScene.swift           # TScene protocol, WindowGroup, SceneBuilder
+│   │   │   ├── App.swift              # App protocol, AppRunner, StatusBarState
+│   │   │   └── Scene.swift            # Scene protocol, WindowGroup, SceneBuilder
 │   │   ├── Core/
-│   │   │   ├── TView.swift            # TView protocol (central)
-│   │   │   ├── TViewBuilder.swift     # @resultBuilder for declarative composition
+│   │   │   ├── View.swift             # View protocol (central)
+│   │   │   ├── ViewBuilder.swift      # @resultBuilder for declarative composition
+│   │   │   ├── ViewModifier.swift     # ViewModifier protocol, ModifiedView
 │   │   │   ├── TupleViews.swift       # TupleView2–TupleView10
 │   │   │   ├── PrimitiveViews.swift   # Never, EmptyView, ConditionalView, etc.
-│   │   │   ├── ViewModifier.swift     # TViewModifier protocol, ModifiedView
 │   │   │   ├── Color.swift            # Color struct (ANSI, 256, RGB, hex, HSL)
 │   │   │   ├── BorderStyle.swift      # Border styles for boxes/cards
-│   │   │   ├── State.swift            # AppState, @TState, Binding
+│   │   │   ├── State.swift            # AppState, @State, Binding
 │   │   │   ├── KeyEvent.swift         # KeyEvent, Key enum, KeyEventDispatcher
 │   │   │   ├── Focus.swift            # FocusManager, Focusable protocol
 │   │   │   ├── Environment.swift      # @Environment, EnvironmentValues, EnvironmentKey
 │   │   │   ├── Preferences.swift      # PreferenceKey, PreferenceValues (bottom-up)
-│   │   │   ├── Theme.swift            # Theme protocol, predefined themes (Phosphor, ncurses, etc.)
+│   │   │   ├── Theme.swift            # Theme protocol, 8 predefined themes
 │   │   │   ├── AppStorage.swift       # @AppStorage, @SceneStorage, StorageBackend
-│   │   │   └── UserDefaultsStorage.swift # Platform-specific UserDefaults implementation
+│   │   │   └── UserDefaultsStorage.swift # Platform-specific UserDefaults
 │   │   ├── Modifiers/
 │   │   │   ├── PaddingModifier.swift
 │   │   │   ├── FrameModifier.swift    # Fixed + flexible frames (min/max/infinity)
@@ -57,50 +57,30 @@ SwiftTUI/
 │   │       ├── Stacks.swift           # VStack, HStack, ZStack + Alignment types
 │   │       ├── Spacer.swift           # Spacer, Divider
 │   │       ├── ForEach.swift          # ForEach (Identifiable, KeyPath, Range)
-│   │       ├── Card.swift             # Styled bordered container
-│   │       ├── Box.swift              # Simple bordered container
-│   │       ├── Panel.swift            # Titled bordered container
+│   │       ├── Card.swift, Box.swift, Panel.swift  # Containers
 │   │       ├── Button.swift           # Interactive button with focus
 │   │       ├── Menu.swift             # Menu with selection and shortcuts
 │   │       ├── Alert.swift            # Modal alert with presets
 │   │       ├── Dialog.swift           # Modal dialog + .modal() modifier
-│   │       └── StatusBar.swift        # TStatusBar, TStatusBarItem, Shortcut
+│   │       └── StatusBar.swift        # StatusBar, StatusBarItem, Shortcut
 │   └── SwiftTUIExample/               # Executable example target
 │       ├── main.swift
 │       ├── AppState.swift
 │       ├── ContentView.swift
-│       ├── Components/
-│       │   ├── HeaderView.swift
-│       │   └── DemoSection.swift
-│       └── Pages/
-│           ├── MainMenuPage.swift
-│           ├── TextStylesPage.swift
-│           ├── ColorsPage.swift
-│           ├── ContainersPage.swift
-│           ├── OverlaysPage.swift
-│           ├── LayoutPage.swift
-│           └── ButtonsPage.swift
-└── Tests/
-    └── SwiftTUITests/
-        ├── TViewTests.swift
-        ├── StatusBarTests.swift
-        ├── ButtonTests.swift
-        ├── FocusTests.swift
-        ├── ColorTests.swift
-        ├── ContainerViewTests.swift
-        ├── FrameBufferTests.swift
-        └── RenderingTests.swift
+│       ├── Components/ (HeaderView, DemoSection)
+│       └── Pages/ (7 demo pages)
+└── Tests/SwiftTUITests/               # 178 tests in 26 suites
 ```
 
 ## Architecture
 
 ### Core Patterns
 
-- **TView** is a protocol (value types, like SwiftUI's View)
-- **@TViewBuilder** is a `@resultBuilder` supporting up to 10 children, conditionals, optionals, for-in
+- **View** is a protocol (value types, like SwiftUI's View)
+- **@ViewBuilder** is a `@resultBuilder` supporting up to 10 children
 - **Primitive views** have `body: Never` and conform to `Renderable`
 - **Composite views** define `body` — renderer walks tree recursively
-- **Environment** for top-down data flow (theme, statusBar, etc.)
+- **Environment** for top-down data flow (theme, statusBar)
 - **Preferences** for bottom-up data flow (child → parent)
 
 ### Rendering Pipeline
@@ -108,33 +88,27 @@ SwiftTUI/
 1. `AppRunner` manages the run loop
 2. `renderToBuffer()` traverses view tree
 3. Views conforming to `Renderable` produce `FrameBuffer`
-4. Composite views recurse via `body`
-5. `FrameBuffer` supports character-level compositing for overlays
+4. `FrameBuffer` supports character-level compositing for overlays
 
 ### Data Flow
 
 - **Environment** (top-down): Theme, StatusBar, custom values
-- **Preferences** (bottom-up): Navigation title, anchors, custom values
-- **@TState**: Local view state with automatic re-render
-- **@AppStorage**: Persistent settings (JSON file or UserDefaults)
+- **Preferences** (bottom-up): Navigation title, anchors
+- **@State**: Local view state with automatic re-render
+- **@AppStorage**: Persistent settings (JSON or UserDefaults)
 - **@SceneStorage**: Scene state restoration
 
 ### Platform Support
 
-- **macOS**: Full support with UserDefaults
-- **Linux**: Full support with JSON file storage, XDG paths
+- **macOS**: Full support with native UserDefaults
+- **Linux**: Full support with JSON storage, XDG paths
 
-## Conventions
+## Naming Conventions
 
-- All code comments and documentation in English
-- Communication with user in German (informal Du)
-- Feature work on dedicated branches
-- No external dependencies
-- No singletons for state (use Environment instead)
-
-## Current Branch
-
-`feature/tview-foundation`
+All types use clean names without prefixes:
+- `View`, `App`, `Scene`, `State` (not TView, TApp, etc.)
+- `ViewBuilder`, `ViewModifier`
+- `StatusBar`, `StatusBarItem`, `StatusBarStyle`
 
 ## Test Execution
 
@@ -142,4 +116,8 @@ SwiftTUI/
 swift test --no-parallel
 ```
 
-Note: `--no-parallel` required due to FocusManager singleton (candidate for Environment refactoring)
+Note: `--no-parallel` required due to FocusManager singleton
+
+## Current Branch
+
+`feature/tview-foundation`
