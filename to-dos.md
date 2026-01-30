@@ -1,26 +1,27 @@
 # TUIKit - Tasks & Feature Ideas
 
 ## 🚀 In Progress
-- [ ] Verify MkDocs deployment on GitHub Pages (https://docs-tuikit.layered.work/)
-- [ ] Test all documentation links and functionality
+- (keine)
 
 ## 📋 Open Tasks
 
 ### Documentation
-- [ ] Auto-generate Swift API documentation from code comments (consider custom solution since mkdocstrings only supports Python)
+- [ ] Expand DocC articles: add more guides and tutorials
+- [ ] Improve inline Swift doc comments for better auto-generated API docs
 - [ ] Create interactive code examples in documentation
-- [ ] Add more getting started tutorials
-- [ ] Document all 8 themes with examples
+- [ ] Document all 5 phosphor themes with visual examples
 - [ ] Add keyboard shortcut reference guide
 
 ### Landing Page
-- [ ] Decide if landing page should be restored (was removed during documentation pivot)
-- [ ] If yes, set up separate landing page (consider static site or separate domain)
+- [ ] Build custom landing page under `/` (currently redirects to DocC)
+- [ ] Design with feature highlights, quick links, GitHub badge
+
+### CI/CD
+- [ ] Add CI workflow for `swift build` + `swift test` on push/PR
 
 ### Testing & Validation
-- [ ] Verify GitHub Actions workflow runs successfully on next push
 - [ ] Test documentation on mobile/tablet
-- [ ] Validate all external links (GitHub, etc.)
+- [ ] Validate all DocC symbol links resolve correctly
 
 ### Code Examples
 - [ ] Create example: Simple counter app
@@ -31,21 +32,26 @@
 
 ## ✅ Completed
 
+### DocC Documentation + GitHub Pages (2026-01-30)
+- ✅ Removed all old documentation (VitePress, MkDocs, legacy DocC)
+- ✅ Added `swift-docc-plugin` to Package.swift
+- ✅ Created DocC Catalog at `Sources/TUIKit/TUIKit.docc/`
+- ✅ Wrote articles: Getting Started, Architecture, State Management, Theming Guide
+- ✅ Full API topic organization on landing page
+- ✅ GitHub Actions workflow for auto-deployment (`docc.yml`)
+- ✅ Custom domain: https://tuikit.layered.work
+- ✅ Fixed blank page issue (missing `theme-settings.json`)
+- ✅ Fixed GitHub Pages build type (`legacy` → `workflow`)
+- ✅ Root redirect `/` → `/documentation/tuikit`
+- ✅ Removed leftover VitePress workflow
+
 ### Documentation System (2026-01-29)
-- ✅ Replaced DocC with MkDocs after path resolution issues
-- ✅ Set up Material theme with dark/light mode
-- ✅ Created comprehensive markdown documentation:
-  - Home page with quick start
-  - Getting started guide with code examples
-  - Complete API reference
-  - Contributing guidelines
-- ✅ Implemented GitHub Actions workflow for auto-deployment
-- ✅ Color scheme configured: Emerald (primary), Indigo (accent)
+- ✅ Replaced DocC with MkDocs (later replaced by DocC again)
+- ✅ VitePress migration (later replaced by DocC)
 
 ### Git Cleanup (2026-01-29)
 - ✅ Removed `.claude/` folder from entire Git history
 - ✅ Added `.claude/` to .gitignore
-- ✅ Kept `.claude/` folder locally
 
 ### Infrastructure
 - ✅ README.md updated with Spotnik screenshot
@@ -53,20 +59,16 @@
 
 ## 🔍 Notes
 
-### Why MkDocs (not DocC)
-- DocC had complex path problems (`/js/`, `/css/` not loading)
-- Missing `theme-settings.json` required by Vue.js frontend
-- Too many hidden dependencies
-- MkDocs is simpler, more reliable, easier to maintain
+### Why DocC (final choice)
+- Native Swift documentation — auto-generates API docs from code comments
+- Apple standard for Swift packages
+- `swift-docc-plugin` integrates cleanly with SPM
+- Requires `theme-settings.json` workaround for GitHub Pages (injected via CI)
 
-### Why not Jazzy
-- Ruby version too old (2.6 installed, 3.0+ required)
-- Would need to upgrade Ruby
-
-### Why not SourceDocs
-- Had issues parsing Swift package correctly
-- More complex setup than needed
+### Why not VitePress/MkDocs
+- Redundant when DocC provides Swift-native API documentation
+- DocC auto-documents all public types, protocols, functions from source
 
 ---
 
-**Last Updated:** 2026-01-29
+**Last Updated:** 2026-01-30
