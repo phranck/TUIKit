@@ -18,8 +18,8 @@ export default function Home() {
             <Image
               src="/tuikit-logo.png"
               alt="TUIkit Logo"
-              width={32}
-              height={32}
+              width={44}
+              height={44}
               className="rounded-lg"
             />
             <span className="text-2xl font-semibold text-foreground">
